@@ -31,7 +31,7 @@ int main(int argc , char *argv[])
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 8888 );
+    server.sin_port = htons( 8080 );
      
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
@@ -97,6 +97,12 @@ void *connection_handler(void *socket_desc)
     message = "Now type in server word to guess and I will show you length of the word \n";
     write(sock , message , strlen(message));
     /////////////////////////////////////////////////////////////////////
+    //Tablica słow:
+    const char *slowa[3];
+    slowa[0] = "kwiaty";
+    slowa[1] = "nic";
+    slowa[2] = "cos";
+
     char hangmanWord[100], tempWord[100];       /**hangmanWord[] array for the original word and tempWord[] array to get the alphabet from user and compare it with original word**/
     char hangmanOutput[100]; 
     char hangmanClientOutput[100];              /**This array will show the remaining blanks and correct inputs**/
@@ -107,9 +113,20 @@ void *connection_handler(void *socket_desc)
     int counter = 0 , position = 0, winner, length , i;
     char alphabetFromUser;
 
-    scanf("%s",hangmanWord);
+    //Wczytaj slowo z tablicy
+
+    //scanf("%s",hangmanWord);
+    int licznik_slow = 0;
+    for(licznik_slow = 0;licznik_slow<3;licznik_slow++){
+        int licznik = 0;
+        puts("Jestem");
+        printf("%d",licznik_slow);
+        int len = strlen(slowa[licznik_slow]);
+        for(licznik = 0;licznik<len;licznik++){
+            hangmanWord[licznik] = slowa[licznik_slow][licznik];}
+    
     length = strlen(hangmanWord);
-    //printf("%d",length);
+    printf("%d",length);
 
 
     //message = "\n\n     The word has %d alphabets \n\n";
@@ -215,7 +232,8 @@ void *connection_handler(void *socket_desc)
                                 //printf("\n\n\t The Word was %s ",hangmanWord);
                                 //printf("\n\n\n\n\t\tEASY HUH???\n\n");
                                 //getchar();
-                                return 0;
+
+                                //return 0; //UWAGA TO BYŁO ODKOMENTOWANE
                             }//end of inner if
                         }//end of outer if
                     }//end of for loop
@@ -229,10 +247,16 @@ void *connection_handler(void *socket_desc)
                 //printf("%c",hangmanOutput[i]);                /**Show the original Word With blanks and right Input alphabet**/
          //UWAGA ZAMIANA NA ZNAK \n NA KOŃCU:   
                 //write(sock , hangmanOutput , strlen(hangmanOutput));
-                write(sock , hangmanClientOutput , strlen(hangmanClientOutput));            
+                write(sock , hangmanClientOutput , strlen(hangmanClientOutput));  
+                if(winner == 0 )
+                {
+                    int x = 0;
+                    for(x = 0;x<length;x++)
+                    hangmanClientOutput[x] = '\0';
+                    break;
+                }          
             //}
         
-
             /////////////////////////////////////////////////////////////////
             //for( i = 0; i < length ; i++)
             //{
@@ -262,5 +286,15 @@ void *connection_handler(void *socket_desc)
             perror("recv failed");
         }
     }
+
+    int g = 0;
+    for(g = 0;g<100;g++)
+    hangmanWord[g] = '\0';
+
+} //licznik_slow
+        //int g = 0;
+        //for(g = 0;g<100;g++)
+        //hangmanWord[g] = '\0';
+    //}//licznik_slow
         return 0;
 } 
