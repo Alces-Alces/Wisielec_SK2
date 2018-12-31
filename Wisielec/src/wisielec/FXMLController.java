@@ -33,6 +33,11 @@ public class FXMLController implements Initializable {
     @FXML
     private TextField TextLabel;
     @FXML
+    private TextField IP_place;
+    @FXML
+    private TextField Domain_place;
+    
+    @FXML
     private Button Button;
     @FXML
     private Button WyslijButton;
@@ -77,6 +82,21 @@ public class FXMLController implements Initializable {
         String clientMessage = TextLabel.getText();
         PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
         writer.println(clientMessage);
+    }
+    
+        @FXML
+    private void PolaczAction(ActionEvent event) throws IOException {
+        if(clientSocket!=null)
+            clientSocket.close();
+        String Ip_string = IP_place.getText();
+        clientSocket = new Socket(Ip_string, 8888); //Połącz z serwerem
+    }
+    @FXML
+    private void DomainAction(ActionEvent event) throws IOException {
+        if(clientSocket!=null)
+            clientSocket.close();
+        String domain = Domain_place.getText();
+        clientSocket = new Socket(java.net.InetAddress.getByName(domain), 8888); //Połącz z serwerem
     }
 
 }

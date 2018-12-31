@@ -45,10 +45,10 @@ public class Wisielec extends Application {
     public static void main(String[] args) throws IOException {
         
         
-        clientSocket = new Socket("192.168.1.105", 8888); //Połącz z serwerem
-        reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        /*clientSocket = new Socket("192.168.1.105", 8888); //Połącz z serwerem*/
+        //reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
         launch(args);
-        clientSocket.close();
+        //clientSocket.close();
         
     }
 
