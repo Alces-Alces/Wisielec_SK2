@@ -33,6 +33,8 @@ public class FXMLController implements Initializable {
     @FXML
     private TextField TextLabel;
     @FXML
+    private TextField TextWynik;
+    @FXML
     private TextField IP_place;
     @FXML
     private TextField Domain_place;
@@ -75,8 +77,15 @@ public class FXMLController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         //TO DO
+                RunThreadRun runner = new RunThreadRun(this);
+        Thread thread =new Thread(runner);
+        thread.start();
     }
 
+    public void Hello(String a)
+        {
+         TextWynik.setText(a);
+        }
     @FXML
     private void WyslijAction(ActionEvent event) throws IOException {
         String clientMessage = TextLabel.getText();
@@ -98,5 +107,6 @@ public class FXMLController implements Initializable {
         String domain = Domain_place.getText();
         clientSocket = new Socket(java.net.InetAddress.getByName(domain), 8888); //Połącz z serwerem
     }
+
 
 }
