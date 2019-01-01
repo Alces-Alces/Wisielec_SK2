@@ -23,12 +23,22 @@ int tablica_punktow[100];
 int id_gracza = 0;
 
 int
-get_id_gracza()
+get_id_gracza_and_inc()
 {
     pthread_mutex_lock(&id_mutex);
     id_gracza = id_gracza + 1;
     pthread_mutex_unlock(&id_mutex); 
     return id_gracza;
+}
+
+int
+get_id_gracza()
+{
+    int id;
+    pthread_mutex_lock(&id_mutex);
+    id = id_gracza;
+    pthread_mutex_unlock(&id_mutex); 
+    return id;
 }
 
 void
@@ -128,7 +138,7 @@ int main(int argc , char *argv[])
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 8080 );
+    server.sin_port = htons( 8888 );
      
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
@@ -183,7 +193,7 @@ void *connection_handler(void *socket_desc)
 {
     //Dolicz gracza do puli
     increment_count(); //którym jestem graczem
-    int id = get_id_gracza();
+    int id = get_id_gracza_and_inc();
     id--;
 
     printf("Jestem graczem: %d\n",id);
@@ -194,9 +204,11 @@ void *connection_handler(void *socket_desc)
     char *message , client_message[2000];
      
     //Send some messages to the client
-    message = "Greetings! I am your connection handler\n";
+    message = "Hejka to ja Twoja obsluga polaczenia! Poczekaj na reszte graczy! \n";
     write(sock , message , strlen(message));
-     
+    
+    //Jeżeli nie ma minimum 2 graczy to sobie poczekaj na kompana
+    while(get_id_gracza()<2){}
     //message = "Now type something and i shall repeat what you type \n";
     message = "Zacznij zgadywac \n";
     write(sock , message , strlen(message));
@@ -216,7 +228,7 @@ void *connection_handler(void *socket_desc)
                                                 /**matchFound to search the alphabet, if the alphabet from user does not exist
                                                 in the original word it will remain 0, upon finding the word, matchFound will
                                                 be set as 1**/
-    int counter = 0 , position = 0, winner, length , i;
+    int counter = 0 , position = 0, winner=100, length , i;//winner ==100 losowa liczba byleby nie 0
     char alphabetFromUser;
 
     //Wczytaj slowo z tablicy
@@ -226,7 +238,8 @@ void *connection_handler(void *socket_desc)
     for(licznik_slow = 0;licznik_slow<3;licznik_slow++)
     {
         int licznik = 0;
-        puts("Nowe slowo");
+        printf("Gracz numer: %d Slowo numer: %d\n",id,licznik_slow);
+        fflush(stdout);
         printf("%d",licznik_slow);
         int len = strlen(slowa[licznik_slow]);
         for(licznik = 0;licznik<len;licznik++){
@@ -281,14 +294,15 @@ void *connection_handler(void *socket_desc)
                     {
                         message = "Przegrana gra! ";
                         write(sock , message , strlen(message));
-                        puts("Nie wygrales");
+                        //puts("Nie wygrales");
                     }
                     else if(wynik > 0)
                     {
                         message = "Wygrana gra! \n";
                         write(sock , message , strlen(message));
-                        puts("Wgrales");
+                        //puts("Wgrales");
                     }
+                    close(sock); //Zamknij socket
                     return 0;
                 }
 
@@ -383,17 +397,26 @@ void *connection_handler(void *socket_desc)
                     //printf("%c",hangmanOutput[i]);                /**Show the original Word With blanks and right Input alphabet**/
              //UWAGA ZAMIANA NA ZNAK \n NA KOŃCU:   
                     //write(sock , hangmanOutput , strlen(hangmanOutput));
-                    write(sock , hangmanClientOutput , strlen(hangmanClientOutput));  
+                    write(sock , hangmanClientOutput , strlen(hangmanClientOutput));
+
+                    printf("Gracz: %d, moze zrobic: %d bledow.\n",id,wrongTry);
+                    fflush(stdin);  
+                    
                     //Wyczyść output dla klienta przed następnym słowem
                     if(winner == 0 )
-                    {
+                    {   
+                        if(licznik_slow!=2){
+                        message = "Pora na kolejne slowo!\n";
+                        write(sock , message , strlen(message));} 
+                        //Czyszczenie
                         int x = 0;
                         for(x = 0;x<length;x++)
                         hangmanClientOutput[x] = '\0';
+                        //puts("Olaboga");
                         break;
                     }          
                 //}
-            
+                //puts("1");
                     if(wrongTry == 0)
                     {
                         message = "Straciles szansy, poczekaj na wyniki!\n";
@@ -408,6 +431,7 @@ void *connection_handler(void *socket_desc)
                             //printf("Ile graczy: %lld\n",get_count());
                         }
                          printf("Wylazlem!: %lld %d\n",get_count(),id);
+                         fflush(stdin);
                         if(get_count() == 1)
                         {
                             dodaj_swoje_punkty(punkty,id);
@@ -424,10 +448,12 @@ void *connection_handler(void *socket_desc)
                                 write(sock , message , strlen(message));
                                 puts("Wgrales");
                             }
+                            close(sock); //Zamknij socket
                             return 0;
                         }
 
                     }
+                //puts("2");
                 /////////////////////////////////////////////////////////////////
                 //for( i = 0; i < length ; i++)
                 //{
@@ -446,7 +472,7 @@ void *connection_handler(void *socket_desc)
                 //clear the message buffer
                 memset(client_message, 0, 2000);
             //}
-         
+            //puts("3");
             if(read_size == 0)
             {
                 puts("Client disconnected");
@@ -456,6 +482,7 @@ void *connection_handler(void *socket_desc)
             {
                 perror("recv failed");
             }
+      
         }
 
         //Wyczyść output dla klienta przed następnym słowem
@@ -468,6 +495,36 @@ void *connection_handler(void *socket_desc)
         hangmanWord[g] = '\0';
 
     } //licznik_slow
+    message = "Zgadles wszystko poczekaj na wyniki! \n";
+    write(sock , message , strlen(message));
+
+    //Jeżeli zgadłeś wszystkie słowa i czekasz na wyniki to:
+    decrement_count();
+
+    while(get_count()!=1)
+    {
+         //printf("Ile graczy: %lld\n",get_count());
+    }
+    printf("Wylazlem!: %lld %d\n",get_count(),id);
+    if(get_count() == 1)
+    {
+        dodaj_swoje_punkty(punkty,id);
+        int wynik = czy_wygrana(id,punkty);
+        if(wynik == 0)
+        {
+            message = "Przegrana gra! \n";
+            write(sock , message , strlen(message));
+            puts("Nie wygrales");
+        }
+        else
+        {
+            message = "Wygrana gra! \n";
+            write(sock , message , strlen(message));
+            puts("Wgrales");
+        }
+            close(sock); //Zamknij socket
+            return 0;
+    }
 
 
         return 0;
