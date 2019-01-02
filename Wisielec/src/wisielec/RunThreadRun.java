@@ -32,20 +32,31 @@ public class RunThreadRun  implements Runnable {
         while(true)
         {
          if(clientSocket!=null)
-         {
+         {   
+             /*
              try {
-                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             } catch (IOException ex) {
+             Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
+             }
+             
+             try {
+             inputLine = reader.readLine();
+             } catch (IOException ex) {
+             Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
+             }
+             System.out.println("Wiadomość: " + inputLine);
+             */
+             try {
+             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             String inputLine;
+             inputLine = reader.readLine();
+             Platform.runLater(() -> a.Hello(inputLine));
+             //while ((inputLine = reader.readLine()) != null) {
+             System.out.println("Wiadomość: " + inputLine);
              } catch (IOException ex) {
                  Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
              }
-
-            try {
-                inputLine = reader.readLine();
-            } catch (IOException ex) {
-                Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
-            }
-         System.out.println("Wiadomość: " + inputLine);
-         
          }
          else
          try {
@@ -53,7 +64,7 @@ public class RunThreadRun  implements Runnable {
          } catch (InterruptedException ex) {
              Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
          }        
-             Platform.runLater(() -> a.Hello(inputLine));
+             //Platform.runLater(() -> a.Hello("XD"));
 
          
         }

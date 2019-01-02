@@ -19,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import static wisielec.Wisielec.clientSocket;
 import static wisielec.Wisielec.reader;
@@ -38,11 +39,14 @@ public class FXMLController implements Initializable {
     private TextField IP_place;
     @FXML
     private TextField Domain_place;
-    
+
     @FXML
     private Button Button;
     @FXML
     private Button WyslijButton;
+    
+    @FXML
+    private TextArea TextArea;
 
     /**
      * Initializes the controller class.
@@ -54,12 +58,11 @@ public class FXMLController implements Initializable {
         //byte[] buffer = new byte[100];
         //is.read(buffer);
 
-        
         //serverMessage = reader.readLine();
         String inputLine;
         inputLine = reader.readLine();
         //while ((inputLine = reader.readLine()) != null) {
-            System.out.println("Wiadomość: " + inputLine);
+        System.out.println("Wiadomość: " + inputLine);
         //}
 
         //while (reader != null) {
@@ -76,37 +79,44 @@ public class FXMLController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //TO DO
-                RunThreadRun runner = new RunThreadRun(this);
-        Thread thread =new Thread(runner);
-        thread.start();
+        try {
+            //TO DO
+            RunThreadRun runner = new RunThreadRun(this);
+            Thread thread = new Thread(runner);
+            thread.start();
+        } catch (IOException ex) {
+            Logger.getLogger(FXMLController.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
-    public void Hello(String a)
-        {
-         TextWynik.setText(a);
-        }
+    public void Hello(String a) {
+        TextWynik.setText(a);
+        TextArea.appendText(a + "\n");
+    }
+
     @FXML
     private void WyslijAction(ActionEvent event) throws IOException {
         String clientMessage = TextLabel.getText();
         PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
         writer.println(clientMessage);
     }
-    
-        @FXML
+
+    @FXML
     private void PolaczAction(ActionEvent event) throws IOException {
-        if(clientSocket!=null)
+        if (clientSocket != null) {
             clientSocket.close();
+        }
         String Ip_string = IP_place.getText();
-        clientSocket = new Socket(Ip_string, 8888); //Połącz z serwerem
+        clientSocket = new Socket(Ip_string, 8080); //Połącz z serwerem
     }
+
     @FXML
     private void DomainAction(ActionEvent event) throws IOException {
-        if(clientSocket!=null)
+        if (clientSocket != null) {
             clientSocket.close();
+        }
         String domain = Domain_place.getText();
         clientSocket = new Socket(java.net.InetAddress.getByName(domain), 8888); //Połącz z serwerem
     }
-
 
 }
