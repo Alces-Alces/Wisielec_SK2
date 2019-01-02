@@ -138,7 +138,7 @@ int main(int argc , char *argv[])
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 8888 );
+    server.sin_port = htons( 8080 );
      
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
@@ -236,7 +236,7 @@ void *connection_handler(void *socket_desc)
     //scanf("%s",hangmanWord);
     int licznik_slow = 0;
     for(licznik_slow = 0;licznik_slow<3;licznik_slow++)
-    {
+    {winner = 100; //losowa liczba byleby nie 0
         int licznik = 0;
         printf("Gracz numer: %d Slowo numer: %d\n",id,licznik_slow);
         fflush(stdout);
