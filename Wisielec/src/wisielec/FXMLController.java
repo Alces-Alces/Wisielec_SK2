@@ -44,7 +44,7 @@ public class FXMLController implements Initializable {
     private Button Button;
     @FXML
     private Button WyslijButton;
-    
+
     @FXML
     private TextArea TextArea;
 
@@ -90,8 +90,16 @@ public class FXMLController implements Initializable {
     }
 
     public void Hello(String a) {
+        StringBuilder message = new StringBuilder(a);
+        System.out.println("Metoda Hello: "+message);
+        while (message.indexOf("-") != -1) {
+            int isFound = message.indexOf("-");     
+            message.setCharAt(isFound, '\n');
+            System.out.println("Metoda Hello: "+message);
+        }
+
         TextWynik.setText(a);
-        TextArea.appendText(a + "\n");
+        TextArea.appendText(message + "\n");
     }
 
     @FXML
@@ -99,6 +107,7 @@ public class FXMLController implements Initializable {
         String clientMessage = TextLabel.getText();
         PrintWriter writer = new PrintWriter(clientSocket.getOutputStream(), true);
         writer.println(clientMessage);
+        TextLabel.clear();
     }
 
     @FXML
@@ -107,7 +116,7 @@ public class FXMLController implements Initializable {
             clientSocket.close();
         }
         String Ip_string = IP_place.getText();
-        clientSocket = new Socket(Ip_string, 8080); //Połącz z serwerem
+        clientSocket = new Socket(Ip_string, 8888); //Połącz z serwerem
     }
 
     @FXML
@@ -116,7 +125,7 @@ public class FXMLController implements Initializable {
             clientSocket.close();
         }
         String domain = Domain_place.getText();
-        clientSocket = new Socket(java.net.InetAddress.getByName(domain), 8888); //Połącz z serwerem
+        clientSocket = new Socket(java.net.InetAddress.getByName(domain), 8080); //Połącz z serwerem
     }
 
 }
