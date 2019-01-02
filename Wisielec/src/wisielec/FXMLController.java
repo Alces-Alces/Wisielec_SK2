@@ -98,7 +98,7 @@ public class FXMLController implements Initializable {
             System.out.println("Metoda Hello: "+message);
         }
 
-        TextWynik.setText(a);
+        //TextWynik.setText(a);
         TextArea.appendText(message + "\n");
     }
 
@@ -116,7 +116,7 @@ public class FXMLController implements Initializable {
             clientSocket.close();
         }
         String Ip_string = IP_place.getText();
-        clientSocket = new Socket(Ip_string, 8888); //Połącz z serwerem
+        clientSocket = new Socket(Ip_string, 8080); //Połącz z serwerem
     }
 
     @FXML
