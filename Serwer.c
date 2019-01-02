@@ -138,7 +138,7 @@ int main(int argc , char *argv[])
     //Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( 8888 );
+    server.sin_port = htons( 8080 );
      
     //Bind
     if( bind(socket_desc,(struct sockaddr *)&server , sizeof(server)) < 0)
@@ -204,8 +204,9 @@ void *connection_handler(void *socket_desc)
     char *message , client_message[2000];
      
     //Send some messages to the client
-    message = "Hejka to ja Twoja obsluga polaczenia! Poczekaj na reszte graczy! -";
-    write(sock , message , strlen(message));
+    if(id == 0){
+    message = "Hejka to ja Twoja obsluga polaczenia! Poczekaj na reszte graczy! \nn";
+    write(sock , message , strlen(message));}
     
     //Jeżeli nie ma minimum 2 graczy to sobie poczekaj na kompana
     while(get_id_gracza()<2){}
@@ -331,7 +332,10 @@ void *connection_handler(void *socket_desc)
                         //showHangman(wrongTry);
                         //getchar();
                         wrongTry--;
+                        //if(wrongTry == 0){//Jeżeli już nie ma żyć to wyślij to z \n jako ostatnią wiadomość tej pętli, jeśli życia jeszcze ma to z -
                         message = "Marny koniec nadchodzi -";
+                    	//}
+                        //else{message = "Marny koniec nadchodzi -";}
                         write(sock , message , strlen(message));
                     }//end of if()
                     else
@@ -397,7 +401,11 @@ void *connection_handler(void *socket_desc)
                     //printf("%c",hangmanOutput[i]);                /**Show the original Word With blanks and right Input alphabet**/
              //UWAGA ZAMIANA NA ZNAK \n NA KOŃCU:   
                     //write(sock , hangmanOutput , strlen(hangmanOutput));
-                	if(winner != 0){
+                	printf("Id gracza: %d WrongTry: %d \n",id,wrongTry);
+                    fflush(stdin);  
+                	if(winner != 0 && wrongTry != 0){
+                		printf("Id gracza: %d WrongTry: %d Wyswietlam slowo!\n",id,wrongTry);
+                    	fflush(stdin);  
                     write(sock , hangmanClientOutput , strlen(hangmanClientOutput));}
 
                     printf("Gracz: %d, moze zrobic: %d bledow.\n",id,wrongTry);
@@ -420,9 +428,10 @@ void *connection_handler(void *socket_desc)
                 //puts("1");
                     if(wrongTry == 0)
                     {
-                        message = "Straciles szansy, poczekaj na wyniki!-";
+                        message = "Straciles szansy, poczekaj na wyniki!\n";
                         write(sock , message , strlen(message));     
-                        int shut = shutdown(sock,SHUT_RD);   
+                        int shut = shutdown(sock,SHUT_RD);
+                        sleep(5);   
 
                         //Gracz odpadł, odejmij od puli
                         decrement_count();
@@ -496,9 +505,9 @@ void *connection_handler(void *socket_desc)
         hangmanWord[g] = '\0';
 
     } //licznik_slow
-    message = "Zgadles wszystko poczekaj na wyniki! -";
+    message = "Zgadles wszystko poczekaj na wyniki! \n";
     write(sock , message , strlen(message));
-
+    sleep(5);
     //Jeżeli zgadłeś wszystkie słowa i czekasz na wyniki to:
     decrement_count();
 
