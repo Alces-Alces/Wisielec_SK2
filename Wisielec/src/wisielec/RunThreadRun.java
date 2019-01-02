@@ -18,22 +18,24 @@ import static wisielec.Wisielec.clientSocket;
  *
  * @author Łoś
  */
-public class RunThreadRun  implements Runnable {
+public class RunThreadRun implements Runnable {
+
     public static BufferedReader reader;
     FXMLController a;
-    String inputLine=null;
-    public RunThreadRun(FXMLController A) throws IOException
-    {
-        a=A;
-        
+    String inputLine = null;
+
+    public RunThreadRun(FXMLController A) throws IOException {
+        a = A;
+
     }
+
     @Override
-    public void run(){
-        while(true)
-        {
-         if(clientSocket!=null)
-         {   
-             /*
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()) {
+            //jeżeli wątek ma się wyłączyć to się wyłączy
+            
+            if (clientSocket != null) {
+                /*
              try {
              reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
              } catch (IOException ex) {
@@ -46,29 +48,29 @@ public class RunThreadRun  implements Runnable {
              Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
              }
              System.out.println("Wiadomość: " + inputLine);
-             */
-             try {
-             reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-             String inputLine;
-             inputLine = reader.readLine();
-             Platform.runLater(() -> a.Hello(inputLine));
-             //while ((inputLine = reader.readLine()) != null) {
-             System.out.println("Wiadomość: " + inputLine);
-             } catch (IOException ex) {
-                 Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
-             }
-         }
-         else
-         try {
-             TimeUnit.SECONDS.sleep(1);
-         } catch (InterruptedException ex) {
-             Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
-         }        
-             //Platform.runLater(() -> a.Hello("XD"));
+                 */
+                try {
+                    reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+                    String inputLine;
+                    inputLine = reader.readLine();  
+                    Platform.runLater(() -> a.Hello(inputLine));
+                    if(inputLine.equals("Wygrana gra!") || inputLine.equals("Przegrana gra!"))
+                    {System.out.println("BREAK");
+                        Thread.currentThread().interrupt();}
+                    //while ((inputLine = reader.readLine()) != null) {
+                    System.out.println("Wiadomość: " + inputLine);
+                } catch (IOException ex) {
+                    Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else {
+                try {
+                    TimeUnit.SECONDS.sleep(1);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            //Platform.runLater(() -> a.Hello("XD"));
 
-         
         }
-       }
+    }
 }
-    
-
