@@ -5,25 +5,27 @@
  */
 package wisielec;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.application.Platform;
 import static wisielec.Wisielec.clientSocket;
-import static wisielec.Wisielec.reader;
 
 /**
  *
  * @author Łoś
  */
 public class RunThreadRun  implements Runnable {
-
+    public static BufferedReader reader;
     FXMLController a;
     String inputLine=null;
-    public RunThreadRun(FXMLController A)
+    public RunThreadRun(FXMLController A) throws IOException
     {
         a=A;
+        
     }
     @Override
     public void run(){
@@ -31,6 +33,12 @@ public class RunThreadRun  implements Runnable {
         {
          if(clientSocket!=null)
          {
+             try {
+                 reader = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+             } catch (IOException ex) {
+                 Logger.getLogger(RunThreadRun.class.getName()).log(Level.SEVERE, null, ex);
+             }
+
             try {
                 inputLine = reader.readLine();
             } catch (IOException ex) {
